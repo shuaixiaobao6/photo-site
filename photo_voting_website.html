@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三月花事</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI";
+  background: #0f0f10;
+  color: #fff;
+}
+
+/* 顶部 */
+header {
+  padding: 30px 16px 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+header p {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+/* 容器 */
+.container {
+  padding: 10px 12px 40px;
+}
+
+/* 卡片 */
+.card {
+  margin-bottom: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #1a1a1c;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* 图片 */
+.carousel {
+  position: relative;
+}
+
+.carousel img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  display: block;
+}
+
+/* 按钮 */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.left { left: 8px; }
+.right { right: 8px; }
+
+/* 小圆点 */
+.dots {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 3px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 50%;
+}
+
+.dot.active {
+  background: white;
+}
+
+/* 信息 */
+.info {
+  padding: 14px;
+}
+
+.title {
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #eee;
+}
+
+/* 放大 */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal img {
+  width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* 渐入动画 */
+.card {
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>三月花事</h1>
+  <p>春天被他们留在了镜头里</p>
+</header>
+
+<div class="container" id="gallery"></div>
+
+<div class="modal" id="modal" onclick="closeModal()">
+  <img id="modalImg">
+</div>
+
+<script>
+const folders = [
+  "任相宇",
+  "侯凯耀",
+  "储鸿哲",
+  "刘书豪",
+  "刘孜成",
+  "孟军",
+  "张传厚",
+  "张柯凡",
+  "张琰",
+  "李婧昱",
+  "段芝慧",
+  "洪涛",
+  "潘骏聪",
+  "王定中",
+  "王晨旭",
+  "王辰瑜",
+  "赵佳怡",
+  "郭贝贝"
+];
+
+const data = [];
+
+folders.forEach((folder, index) => {
+  const item = {
+    id: index + 1,
+    images: []
+  };
+
+  for (let i = 1; i <= 10; i++) {
+    const path = `images/${folder}/${i}.jpg`;
+
+    const img = new Image();
+    img.src = path;
+
+    img.onload = () => {
+      item.images.push(path);
+      render();
+    };
+  }
+
+  data.push(item);
+});
+
+let currentIndex = Array(folders.length).fill(0);
+const gallery = document.getElementById('gallery');
+
+function render() {
+  gallery.innerHTML = '';
+
+  data.forEach((item, i) => {
+    if (item.images.length === 0) return;
+
+    const img = item.images[currentIndex[i]];
+
+    const dots = item.images.map((_, idx) =>
+      `<span class="dot ${idx === currentIndex[i] ? 'active' : ''}"></span>`
+    ).join('');
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <div class="carousel">
+        <img src="${img}" onclick="openModal('${img}')">
+        ${item.images.length > 1 ? `
+          <button class="arrow left" onclick="prev(${i})">‹</button>
+          <button class="arrow right" onclick="next(${i})">›</button>
+          <div class="dots">${dots}</div>
+        ` : ''}
+      </div>
+      <div class="info">
+        <div class="title">No.${String(item.id).padStart(2,'0')}</div>
+      </div>
+    `;
+
+    gallery.appendChild(card);
+  });
+}
+
+function next(i) {
+  currentIndex[i] = (currentIndex[i] + 1) % data[i].images.length;
+  render();
+}
+
+function prev(i) {
+  currentIndex[i] = (currentIndex[i] - 1 + data[i].images.length) % data[i].images.length;
+  render();
+}
+
+function openModal(src) {
+  document.getElementById('modal').style.display = 'flex';
+  document.getElementById('modalImg').src = src;
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+render();
+</script>
+
+</body>
+</html>
