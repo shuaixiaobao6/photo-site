@@ -537,7 +537,7 @@
 
     async function collectImages(folderName) {
       const results = [];
-      for (let i = 1; i <= 80; i++) {
+      for (let i = 1; i <= 10; i++) {
         const encoded = encodeURIComponent(folderName);
         const src = `${encoded}/${i}.jpg`;
         const ok = await new Promise((resolve) => {
